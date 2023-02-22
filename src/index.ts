@@ -19,6 +19,7 @@ app.get('/', (request, response) => {
 //produtos
 app.get('/api/products', productController.findAll)
 app.post('/api/products', productController.create)
+app.get('/api/products/:id', productController.findOne)
 
 app.listen(PORT, () => {
   console.log(`server runing in port ${PORT}`)
