@@ -51,21 +51,29 @@ class ProductController {
     const id: string = request.params.id
     const { name, description, weight } = request.body
     const productRepository = AppDataSource.getRepository(Product)
+    let product
 
     try {
-      let product = await productRepository.findOneByOrFail({ id })
+      product = await productRepository.findOneByOrFail({ id })
+    } catch (error) {
+      return response.status(404).send({
+        error: 'Product not found'
+      })
+    }
 
-      product.name = name
-      product.weight = weight
-      product.description = description
+    product.name = name
+    product.weight = weight
+    product.description = description
 
+    try {
       const productDb = await productRepository.save(product)
+
       return response.status(200).send({
         data: productDb
       })
     } catch (error) {
-      return response.status(404).send({
-        error: 'Product not found'
+      return response.status(500).send({
+        error: 'Internal error'
       })
     }
   }
