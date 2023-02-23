@@ -1,4 +1,4 @@
-import {Request, Response} from 'express'
+import { Request, Response } from 'express'
 import { Repository } from 'typeorm'
 import AppDataSource from '../../connection'
 import { Product } from '../../entities/product.entity'
@@ -17,17 +17,22 @@ class ProductController {
   async findOne(request: Request, response: Response): Promise<Response> {
     const id: string = request.params.id
     const productRepository = AppDataSource.getRepository(Product)
-    const product = await productRepository.findOneBy({ id })
 
-    if (!product) return response.status(404).send({error: 'Product not found'})
+    try {
+      const product = await productRepository.findOneByOrFail({ id })
 
-    return response.status(200).send({
-      data: product
-    })
+      return response.status(200).send({
+        data: product
+      })
+    } catch (error) {
+      return response.status(404).send({
+        error: 'Product not found'
+      })
+    }
   }
 
   async create(request: Request, response: Response): Promise<Response> {
-    const {name, description, weight} = request.body
+    const { name, description, weight } = request.body
 
     const newProduct = new Product
     newProduct.name = name
@@ -41,6 +46,30 @@ class ProductController {
       data: product
     })
   }
+
+  async update(request: Request, response: Response): Promise<Response> {
+    const id: string = request.params.id
+    const { name, description, weight } = request.body
+    const productRepository = AppDataSource.getRepository(Product)
+
+    try {
+      let product = await productRepository.findOneByOrFail({ id })
+
+      product.name = name
+      product.weight = weight
+      product.description = description
+
+      const productDb = await productRepository.save(product)
+      return response.status(200).send({
+        data: productDb
+      })
+    } catch (error) {
+      return response.status(404).send({
+        error: 'Product not found'
+      })
+    }
+  }
+
 }
 
 
