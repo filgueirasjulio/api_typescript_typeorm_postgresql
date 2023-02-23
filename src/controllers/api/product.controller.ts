@@ -1,3 +1,4 @@
+import { validate } from 'class-validator'
 import { Request, Response } from 'express'
 import { Repository } from 'typeorm'
 import AppDataSource from '../../connection'
@@ -39,6 +40,14 @@ class ProductController {
     newProduct.weight = weight
     newProduct.description = description
 
+    const errors = await validate(newProduct)
+    if (errors.length > 0) {
+      return response.status(422).send({
+        errors
+      })
+    }
+
+
     const productRepository = AppDataSource.getRepository(Product)
     const product = await productRepository.save(newProduct)
 
@@ -64,6 +73,13 @@ class ProductController {
     product.name = name
     product.weight = weight
     product.description = description
+
+    const errors = await validate(product)
+    if (errors.length > 0) {
+      return response.status(422).send({
+        errors
+      })
+    }
 
     try {
       const productDb = await productRepository.save(product)
