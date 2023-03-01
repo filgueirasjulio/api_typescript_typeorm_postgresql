@@ -1,15 +1,18 @@
+import 'module-alias/register'
 import express from 'express'
 import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
+import cors from 'cors'
 dotenv.config()
 
-import './connection';
-import productController from './controllers/api/product.controller';
+import '@/connection';
+import productController from '@/controllers/api/product.controller';
 
 const PORT = process.env.PORT || 8080
 
 const app = express()
 app.use(bodyParser.json())
+app.use(cors())
 
 //rotas
 app.get('/', (request, response) => {
