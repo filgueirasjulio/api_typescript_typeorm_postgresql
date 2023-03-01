@@ -1,31 +1,21 @@
 import 'module-alias/register'
-import express from 'express'
-import dotenv from 'dotenv'
 import bodyParser from 'body-parser'
+import express from 'express'
 import cors from 'cors'
+
+import dotenv from 'dotenv'
 dotenv.config()
 
-import '@/connection';
-import productController from '@/controllers/api/product.controller';
+import '@/database/connection'
+import routes from '@/routes/api'
 
 const PORT = process.env.PORT || 8080
 
 const app = express()
 app.use(bodyParser.json())
 app.use(cors())
-
-//rotas
-app.get('/', (request, response) => {
-  response.send("server up")
-})
-
-//produtos
-app.get('/api/products', productController.findAll)
-app.post('/api/products', productController.create)
-app.get('/api/products/:id', productController.findOne)
-app.put('/api/products/:id', productController.update)
-app.delete('/api/products/:id', productController.delete)
+app.use(routes)
 
 app.listen(PORT, () => {
-  console.log(`server runing in port ${PORT}`)
+  console.log(`server running in port  ${PORT}`)
 })
