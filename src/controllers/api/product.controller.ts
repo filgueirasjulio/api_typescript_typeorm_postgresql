@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import AppDataSource from '@/database/connection'
 import { Product } from '@/entities/product.entity'
 import { productRepository } from '@/repositories/product.repository'
+import CreateProductDTO from '@/dtos/products/create.dto'
 
 class ProductController {
   private productRepository: productRepository
@@ -36,27 +37,18 @@ class ProductController {
     }
   }
 
-  async create(request: Request, response: Response): Promise<Response> {
+  create = async (request: Request, response: Response): Promise<Response> => {
     const { name, description, weight } = request.body
 
-    const newProduct = new Product
-    newProduct.name = name
-    newProduct.weight = weight
-    newProduct.description = description
+    const dto = new CreateProductDTO
+    dto.name = name
+    dto.description = description
+    dto.weight = weight
 
-    const errors = await validate(newProduct)
-    if (errors.length > 0) {
-      return response.status(422).send({
-        errors
-      })
-    }
-
-
-    const productRepository = AppDataSource.getRepository(Product)
-    const product = await productRepository.save(newProduct)
+    const newProduct = await this.productRepository.create(dto)
 
     return response.status(201).send({
-      data: product
+      data: newProduct
     })
   }
 

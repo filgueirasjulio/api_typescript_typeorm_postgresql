@@ -1,6 +1,7 @@
 import { Product } from "@/entities/product.entity";
 import { Repository } from "typeorm";
 import AppDataSource from "@/database/connection";
+import CreateProductDTO from "@/dtos/products/create.dto";
 
 export class productRepository {
   private repository: Repository<Product>
@@ -11,5 +12,15 @@ export class productRepository {
 
   async getAll(): Promise<Product[]> {
     return await this.repository.find()
+  }
+
+  async create(input: CreateProductDTO): Promise<Product> {
+
+    const newProduct = new Product
+    newProduct.name = input.name
+    newProduct.weight = input.weight
+    newProduct.description = input.description
+
+    return await this.repository.save(newProduct)
   }
 }
