@@ -39,11 +39,18 @@ class ProductController {
 
   create = async (request: Request, response: Response): Promise<Response> => {
     const { name, description, weight } = request.body
-
     const dto = new CreateProductDTO
+
     dto.name = name
     dto.description = description
     dto.weight = weight
+
+    const errors = await validate(dto)
+    if (errors.length > 0) {
+      return response.status(422).send({
+        error: errors
+      })
+    }
 
     const newProduct = await this.productRepository.create(dto)
 

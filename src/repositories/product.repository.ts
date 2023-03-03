@@ -1,6 +1,6 @@
 import { Product } from "@/entities/product.entity";
 import { Repository } from "typeorm";
-import AppDataSource from "@/database/connection";
+import  AppDataSource from "@/database/connection";
 import CreateProductDTO from "@/dtos/products/create.dto";
 
 export class productRepository {
