@@ -1,5 +1,6 @@
 import { IsNotEmpty, Length } from "class-validator";
-export default class CreateProductDTO {
+
+export class CreateProductDTO {
   @IsNotEmpty()
   @Length(3, 255)
   name: string
@@ -12,3 +13,6 @@ export default class CreateProductDTO {
   weight: number
 }
 
+export class UpdateProductDTO extends CreateProductDTO {
+  id: string
+}

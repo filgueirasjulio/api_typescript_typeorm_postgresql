@@ -1,7 +1,7 @@
 import { Product } from "@/entities/product.entity";
 import { Repository } from "typeorm";
 import  AppDataSource from "@/database/connection";
-import CreateProductDTO from "@/dtos/products/create.dto";
+import  { CreateProductDTO, UpdateProductDTO } from "@/dtos/product.dto";
 
 export class productRepository {
   private repository: Repository<Product>
@@ -14,6 +14,10 @@ export class productRepository {
     return await this.repository.find()
   }
 
+  async find(id: string): Promise<Product | null> {
+    return await this.repository.findOneBy( {id} )
+  }
+
   async create(input: CreateProductDTO): Promise<Product> {
 
     const newProduct = new Product
@@ -24,8 +28,18 @@ export class productRepository {
     return await this.repository.save(newProduct)
   }
 
-  async find(id: string): Promise<Product | null> {
-    return await this.repository.findOneBy( {id} )
+
+  async update(input: UpdateProductDTO): Promise<Product|null> {
+
+    const product = await this.find(input.id)
+    if (!product) {
+      return null
+    }
+    product.name = input.name
+    product.weight = input.weight
+    product.description = input.description
+
+    return await this.repository.save(product)
   }
 
   async delete(id: string) {

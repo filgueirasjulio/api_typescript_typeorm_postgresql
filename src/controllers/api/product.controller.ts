@@ -1,9 +1,7 @@
 import { validate } from 'class-validator'
 import { Request, Response } from 'express'
-import AppDataSource from '@/database/connection'
-import { Product } from '@/entities/product.entity'
 import { productRepository } from '@/repositories/product.repository'
-import CreateProductDTO from '@/dtos/products/create.dto'
+import { CreateProductDTO, UpdateProductDTO } from '@/dtos/product.dto'
 
 class ProductController {
   private productRepository: productRepository
@@ -58,25 +56,18 @@ class ProductController {
     })
   }
 
-  async update(request: Request, response: Response): Promise<Response> {
+  update = async (request: Request, response: Response): Promise<Response> => {
     const id: string = request.params.id
-    const { name, description, weight } = request.body
-    const productRepository = AppDataSource.getRepository(Product)
+    const {name, description, weight } = request.body
     let product
 
-    try {
-      product = await productRepository.findOneByOrFail({ id })
-    } catch (error) {
-      return response.status(404).send({
-        error: 'Product not found'
-      })
-    }
+    const dto = new UpdateProductDTO
+    dto.id = id
+    dto.name = name
+    dto.description = description
+    dto.weight = weight
 
-    product.name = name
-    product.weight = weight
-    product.description = description
-
-    const errors = await validate(product)
+    const errors = await validate(dto)
     if (errors.length > 0) {
       return response.status(422).send({
         errors
@@ -84,10 +75,15 @@ class ProductController {
     }
 
     try {
-      const productDb = await productRepository.save(product)
+      const product = await this.productRepository.update(dto)
+      if (!product) {
+        return response.status(404).send({
+          error: 'Product not found'
+        })
+      }
 
       return response.status(200).send({
-        data: productDb
+        data: product
       })
     } catch (error) {
       return response.status(500).send({
